@@ -1,9 +1,5 @@
-"
 " * goes to the next matching word
 " # goes to the previous matching word
-" if $tmux == ''
-  " set clipboard+=unnamed
-" endif
 set backspace=indent,eol,start
 set relativenumber number
 set shiftwidth=2
