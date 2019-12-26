@@ -82,8 +82,7 @@ Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
 " Plug 'altercation/vim-colors-solarized'
 " Plug 'tomasr/molokai'
 " Plug 'rakr/vim-one'
-" Plug 'haishanh/night-owl.vim'
-Plug 'sainnhe/gruvbox-material'
+Plug 'haishanh/night-owl.vim'
 " End Themes
 
 " ROR
@@ -127,9 +126,7 @@ endif
 syntax enable
 " colorscheme molokai
 " colorscheme one "Link: https://github.com/rakr/vim-one#true-color-support
-" colorscheme night-owl
-let g:gruvbox_material_background='medium'
-colorscheme gruvbox-material
+colorscheme night-owl
 " http://www.terminally-incoherent.com/blog/2012/10/17/vim-solarized-and-tmux/
 " set t_Co=256  " force vim to use 256 colors
 " let g:solarized_termcolors=256
@@ -147,8 +144,7 @@ colorscheme gruvbox-material
 
 " Vim-ariline
 let g:airline_powerline_fonts=1
-" let g:airline_theme='night_owl'
-let g:airline_theme='gruvbox_material'
+let g:airline_theme='night_owl'
 " let g:airline_theme='simple'
 " let g:airline_theme='one'
 set laststatus=2
