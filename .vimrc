@@ -61,6 +61,7 @@ Plug 'kien/ctrlp.vim'
 Plug 'fatih/vim-go'
 " https://octetz.com/posts/vim-as-go-ide
 Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+Plug 'dense-analysis/ale'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-bundler'
 Plug 'vim-airline/vim-airline'
@@ -71,7 +72,6 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'haishanh/night-owl.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'scrooloose/nerdcommenter'
-Plug 'dense-analysis/ale'
 call plug#end()
 " call vundle#end()            " required
 
