@@ -81,8 +81,8 @@ Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
 " Plug 'Chiel92/vim-autoformat'
 " Plug 'altercation/vim-colors-solarized'
 " Plug 'tomasr/molokai'
-" Plug 'rakr/vim-one'
-Plug 'haishanh/night-owl.vim'
+Plug 'rakr/vim-one'
+" Plug 'haishanh/night-owl.vim'
 " End Themes
 
 " ROR
@@ -117,21 +117,25 @@ Plug 'junegunn/rainbow_parentheses.vim'
 call plug#end()
 
 " Themes
-set background=dark
 if (has("termguicolors"))
   " let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
   " let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
   set termguicolors " Link: https://github.com/rakr/vim-one/issues/60#issuecomment-333296652
 endif
+
 syntax enable
 " colorscheme molokai
-" colorscheme one "Link: https://github.com/rakr/vim-one#true-color-support
-colorscheme night-owl
+colorscheme one "Link: https://github.com/rakr/vim-one#true-color-support
+" colorscheme night-owl
 " http://www.terminally-incoherent.com/blog/2012/10/17/vim-solarized-and-tmux/
 " set t_Co=256  " force vim to use 256 colors
 " let g:solarized_termcolors=256
 " let g:solarized_termtrans=1
 " let g:solarized_degrade=1
+let g:one_allow_italics = 1
+
+set background=light
+" set background=dark
 " End Themes
 
 " Neomake
@@ -144,9 +148,9 @@ colorscheme night-owl
 
 " Vim-ariline
 let g:airline_powerline_fonts=1
-let g:airline_theme='night_owl'
+" let g:airline_theme='night_owl'
 " let g:airline_theme='simple'
-" let g:airline_theme='one'
+let g:airline_theme='one'
 set laststatus=2
 let g:airline#extensions#tabline#enabled = 1
 " End Vim-airline
