@@ -30,6 +30,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'Yggdroot/indentLine'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-abolish'
 Plug 'raimondi/delimitmate'
 Plug 'fatih/vim-go', { 'tag': '*' } " Golang
 " ****** END MANDATORY Plugin *****
@@ -79,9 +80,9 @@ Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
 
 " Themes
 " Plug 'Chiel92/vim-autoformat'
-" Plug 'altercation/vim-colors-solarized'
 " Plug 'tomasr/molokai'
-Plug 'rakr/vim-one'
+" Plug 'rakr/vim-one'
+Plug 'morhetz/gruvbox'
 " Plug 'haishanh/night-owl.vim'
 " End Themes
 
@@ -124,18 +125,14 @@ if (has("termguicolors"))
 endif
 
 syntax enable
-" colorscheme molokai
-colorscheme one "Link: https://github.com/rakr/vim-one#true-color-support
-" colorscheme night-owl
-" http://www.terminally-incoherent.com/blog/2012/10/17/vim-solarized-and-tmux/
-" set t_Co=256  " force vim to use 256 colors
-" let g:solarized_termcolors=256
-" let g:solarized_termtrans=1
-" let g:solarized_degrade=1
+" colorscheme one "Link: https://github.com/rakr/vim-one#true-color-support
 let g:one_allow_italics = 1
+" colorscheme night-owl
 
-set background=light
-" set background=dark
+" set background=light
+set background=dark
+" colorscheme molokai
+colorscheme gruvbox
 " End Themes
 
 " Neomake
@@ -150,7 +147,8 @@ set background=light
 let g:airline_powerline_fonts=1
 " let g:airline_theme='night_owl'
 " let g:airline_theme='simple'
-let g:airline_theme='one'
+" let g:airline_theme='one'
+let g:airline_theme='gruvbox'
 set laststatus=2
 let g:airline#extensions#tabline#enabled = 1
 " End Vim-airline
@@ -170,6 +168,7 @@ autocmd FileType go nmap <leader>r  <Plug>(go-run)
 autocmd FileType go nmap <leader>t  :GoAddTags<CR>
 autocmd FileType go nmap <leader>rt  :GoRemoveTags<CR>
 autocmd FileType go nmap <leader>rt  :GoRemoveTags<CR>
+autocmd FileType go nmap <leader>gi  :GoImports<CR>
 " Somtime use leader is delay, so use `g` instead
 autocmd FileType go nmap gt  <Plug>(go-def)
 autocmd FileType go nmap gb  <Plug>(go-def-pop)
@@ -180,6 +179,7 @@ let g:go_fmt_command = "gofmt"
 " let g:go_def_mode = "godef" "https://github.com/fatih/vim-go/issues/1877#issuecomment-405507049
 let g:go_addtags_transform = "snakecase"
 let g:go_def_mapping_enabled = 0
+let g:go_gopls_enabled=0
 " https://hackernoon.com/my-neovim-setup-for-go-7f7b6e805876
 let g:go_highlight_build_constraints = 1
 let g:go_highlight_extra_types = 1
@@ -259,8 +259,8 @@ augroup rainbow_lisp
   autocmd FileType lisp,clojure,scheme RainbowParentheses
 augroup END
 
-map <Leader>e64 :s/\(\w\+.*\): \(\w\+.*\)/\=substitute(substitute(submatch(1).": ".submatch(2), submatch(2), system('base64', submatch(2)), ""), "\n", "", "")<CR><CR>
-map <Leader>d64 :s/\(\w\+.*\): \(\w\+.*\)/\=substitute(substitute(submatch(1).": ".submatch(2), submatch(2), system('base64 --decode', submatch(2)), ""), "\n", "", "")<CR><CR>
+noremap <Leader>e64 :s/\(\w\+.*\): \(\w\+.*\)/\=substitute(substitute(submatch(1).": ".submatch(2), submatch(2), system('base64', submatch(2)), ""), "\n", "", "")<CR><CR>
+noremap <Leader>d64 :s/\(\w\+.*\): \(\w\+.*\)/\=substitute(substitute(submatch(1).": ".submatch(2), submatch(2), system('base64 --decode', submatch(2)), ""), "\n", "", "")<CR>:nohlsearch<CR>
 
 " Plugin key-mappings.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
@@ -295,6 +295,8 @@ nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
+
+nmap <leader>rn <Plug>(coc-rename)
 " END COC
 
 " ALE
@@ -306,3 +308,7 @@ nmap <silent> gr <Plug>(coc-references)
 " highlight clear ALEErrorSign
 " highlight clear ALEWarningSign
 " ALE END
+
+nnoremap <leader>ev :e $MYVIMRC<cr>
+nnoremap <leader>vv :vs $MYVIMRC<cr>
+nnoremap <leader>sv :source $MYVIMRC<cr>
