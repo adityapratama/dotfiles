@@ -1,17 +1,19 @@
 " set line number
+set hlsearch
 set relativenumber number
 set cursorline
-" set clipboard=unnamed
 if $TMUX == ''
   set clipboard+=unnamed
 endif
-" size of a hard tabstop
-" set tabstop=2
+
+" In the quickfix window, <CR> is used to jump to the error under the
+" cursor, so undefine the mapping there.
+autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
 
 " http://vi.stackexchange.com/a/21
 set backspace=indent,eol,start
 
-" size of an "indent"
+" size of an indent
 set shiftwidth=2
 " a combination of spaces and tabs are used to simulate tab stops at a width
 " other than the (hard)tabstop
@@ -21,44 +23,31 @@ set expandtab
 set autoindent
 set autowrite
 
+" https://www.reddit.com/r/vim/comments/2391u5/delay_while_using_esc_to_exit_insert_mode/
+set ttimeout
+set ttimeoutlen=100
+set timeoutlen=3000
+
+" https://vim.fandom.com/wiki/Change_cursor_shape_in_different_modes
+let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
+let &t_SR = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=2\x7\<Esc>\\"
+let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
+
 " VUNDLE
 set nocompatible              " be iMproved, required
 filetype on
 " filetype off                  " required
 filetype plugin indent on
 
-" set the runtime path to include Vundle and initialize
-" set rtp+=~/.vim/bundle/Vundle.vim
-" call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required
-" Plugin 'VundleVim/Vundle.vim'
 call plug#begin('~/.vim/plugged')
-
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
 " plugin on GitHub repo
 Plug 'tpope/vim-fugitive'
-" plugin from http://vim-scripts.org/vim/scripts.html
-" Plug 'L9'
-" Git plugin not hosted on GitHub
-" Plug 'git://git.wincent.com/command-t.git'
-" The sparkup vim script is in a subdirectory of this repo called vim.
-" Pass the path to set the runtimepath properly.
-" Plug 'rstacruz/sparkup', {'rtp': 'vim/'}
-" Install L9 and avoid a Naming conflict if you've already installed a
-" different version somewhere else.
-"Plugin 'ascenator/L9', {'name': 'newL9'}
-
-" All of your Plugins must be added before the following line
-
-" Plug 'https://github.com/scrooloose/syntastic'
-" Plug 'altercation/vim-colors-solarized'
 Plug 'scrooloose/nerdtree'
 Plug 'kien/ctrlp.vim'
 Plug 'fatih/vim-go'
+
 " https://octetz.com/posts/vim-as-go-ide
 Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 Plug 'dense-analysis/ale'
@@ -69,50 +58,33 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'Chiel92/vim-autoformat'
 Plug 'mileszs/ack.vim'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'haishanh/night-owl.vim'
+" Plug 'haishanh/night-owl.vim'
+" Plug 'tomasr/molokai'
+Plug 'morhetz/gruvbox'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'scrooloose/nerdcommenter'
 call plug#end()
-" call vundle#end()            " required
 
 " Vim-ariline
 let g:airline_powerline_fonts = 1
 set laststatus=2
 " let g:airline_theme='simple'
-let g:airline_theme='night_owl'
+let g:airline_theme='gruvbox'
 let g:airline#extensions#tabline#enabled = 1
 " End of Vim-airline
 
-" set background=dark
-" http://www.terminally-incoherent.com/blog/2012/10/17/vim-solarized-and-tmux/
-" set t_Co=256  " force vim to use 256 colors
-" let g:solarized_termcolors=256
-" let g:solarized_termtrans=1
-" let g:solarized_degrade=1
-" colorscheme solarized
-" colorscheme molokai
+set background=dark
 if (has("termguicolors"))
+  " Importand for vim 8!
   let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
   let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
   set termguicolors
 endif
 syntax enable
-colorscheme night-owl
+" colorscheme night-owl
+" colorscheme molokai
+colorscheme gruvbox
 let g:ctrlp_map = '<c-p>'
-
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-" let g:syntastic_always_populate_loc_list = 1
-" let g:syntastic_auto_loc_list = 1
-" let g:syntastic_check_on_open = 1
-" let g:syntastic_check_on_wq = 0
-" let g:syntastic_ruby_mri_quiet_messages = { 'regex': 'assigned but unused variabl' }
-
-" let g:syntastic_c_checkers=['make','splint']
-
-" au VimEnter *  NERDTree
 
 " VIM-GO Setting
 let mapleader = ","
@@ -155,11 +127,24 @@ nmap <silent> gr <Plug>(coc-references)
 
 " Ack setting
 if executable('ag')
-  let g:ackprg = 'ag --vimgrep'
+  let g:ackprg = 'ag --nogroup --nocolor --column'
+  " let g:ackprg = 'ag --vimgrep'
   " let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 endif
 cnoreabbrev Ack Ack!
-nnoremap <Leader>a :Ack!<Space>
+
+function! SearchAck(string) abort
+  let saved_shellpipe = &shellpipe
+  let &shellpipe = '>'
+  try
+    execute 'Ack!' shellescape(a:string, 1)
+  finally
+    let &shellpipe = saved_shellpipe
+  endtry
+endfunction
+
+nnoremap <Leader>a :call SearchAck("")<left><left>
+" nnoremap <Leader>a :Ack!<Space>
 " End of Ack setting
 
 " Fzf
@@ -195,3 +180,6 @@ let g:airline#extensions#ale#enabled = 1
 highlight clear ALEErrorSign
 highlight clear ALEWarningSign
 " ALE END
+
+packloadall
+silent! helptags ALL
