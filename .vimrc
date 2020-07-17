@@ -63,7 +63,14 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'morhetz/gruvbox'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'scrooloose/nerdcommenter'
+Plug '~/.vim/plugged/potion'
+Plug '~/.vim/plugged/vim-secret'
+
+Plug 'thinca/vim-quickrun'
 call plug#end()
+
+" Remap clipboard copy/paste
+noremap <C-y> "*y
 
 " Vim-ariline
 let g:airline_powerline_fonts = 1
@@ -88,6 +95,7 @@ let g:ctrlp_map = '<c-p>'
 
 " VIM-GO Setting
 let mapleader = ","
+let maplocalleader = "_"
 map <C-n> :cnext<CR>
 map <C-m> :cprevious<CR>
 nnoremap <leader>a :cclose<CR>
@@ -183,3 +191,11 @@ highlight clear ALEWarningSign
 
 packloadall
 silent! helptags ALL
+
+" noremap <Leader>e64 :s/\(\w\+.*\): \(\w\+.*\)/\=substitute(substitute(submatch(1).": ".submatch(2),submatch(2), system('base64', submatch(2)), ""), "\n", "", "")<CR>:nohlsearch<CR>
+" noremap <Leader>d64 :s/\(\w\+.*\): \(\w\+.*\)/\=substitute(substitute(submatch(1).": ".submatch(2), submatch(2), system('base64 --decode', submatch(2)), ""), "\n", "","")<CR>:nohlsearch<CR>
+
+
+" QUICKRUN
+let b:quickrun_config = {'outputter': 'popup'}
+" END QUICKRUN
