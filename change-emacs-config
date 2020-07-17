@@ -1,32 +1,38 @@
 #! /bin/bash
 
-function remove_previous_config() {
-  rm ~/.emacs
-  rm ~/.emacs.d
+function remove_previous_configs() {
+  [ -L "$HOME/.emacs" ] && rm $HOME/.emacs
+  [ -L "$HOME/.emacs.d" ] && rm $HOME/.emacs.d
+}
+
+function success_message() {
+    echo "> emacs config changed to '$1'"
 }
 
 function change_emacs_config() {
   local type=$1
   
   if [ "$type" == "vanilla" ]; then
-    remove_previous_config
+    remove_previous_configs
 
-    ln -s $PWD/.emacs ~/.emacs
-    ln -s $PWD/.emacs.d ~/.emacs.d
+    ln -s $PWD/.emacs $HOME/.emacs
+    ln -s $PWD/.emacs.d $HOME/.emacs.d
 
-    echo "> emacs config changed to 'vanilla'"
+    success_message $type
   elif [ "$type" == "doom" ]; then
-    remove_previous_config
+    remove_previous_configs
 
-    ln -s $PWD/doom-emacs ~/.emacs.d
+    ln -s $PWD/doom-emacs $HOME/.emacs.d
 
-    echo "> emacs config changed to 'doom'"
+    [ ! -d "$HOME/.doom.d" ] && ln -s $PWD/.doom.d $HOME/.doom.d
+
+    success_message $type
   elif [ "$type" == "space" ]; then
-    remove_previous_config
+    remove_previous_configs
 
-    ln -s $PWD/spacemacs ~/.emacs.d
+    ln -s $PWD/spacemacs $HOME/.emacs.d
 
-    echo "> emacs config changed to 'spacemacs'"
+    success_message $type
   else
     echo "> ooops... type of emacs config not found"
     echo "
