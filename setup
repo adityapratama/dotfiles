@@ -1,0 +1,6 @@
+#! /bin/bash
+
+ln -s $PWD/init.vim ~/.config/nvim/init.vim
+ln -s $PWD/coc-settings.json ~/.config/nvim/coc-settings.json
+ln -s $PWD/.vimrc ~/.vimrc
+ln -s $PWD/.tmux.conf ~/.tmux.conf
