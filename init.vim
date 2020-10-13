@@ -134,19 +134,23 @@ nnoremap <leader>c :cclose<CR>
 " }}}
 
 " VIM-GO setting {{{
-autocmd FileType go nmap <leader>b  <Plug>(go-build)
-autocmd FileType go nmap <leader>r  <Plug>(go-run)
-autocmd FileType go nmap <leader>t  :GoAddTags<CR>
-autocmd FileType go nmap <leader>rt  :GoRemoveTags<CR>
-autocmd FileType go nmap <leader>gi  :GoImports<CR>
-autocmd FileType go nmap <leader>ga  :GoAlternate<CR>
-autocmd FileType go nmap <leader>gd  :GoDecls<CR>
-autocmd FileType go nmap <leader>ggd  :GoDeclsDir<CR>
-" Sometime use leader is delay, so use `g` instead
-autocmd FileType go nmap gt  <Plug>(go-def)
-autocmd FileType go nmap gb  <Plug>(go-def-pop)
-autocmd FileType go nmap gs  <Plug>(go-def-stack)
-autocmd FileType go nmap gc  <Plug>(go-def-stack-clear)
+augroup golang
+  autocmd!
+  autocmd FileType go nmap <leader>b  <Plug>(go-build)
+  autocmd FileType go nmap <leader>r  <Plug>(go-run)
+  autocmd FileType go nmap <leader>t  :GoAddTags<CR>
+  autocmd FileType go nmap <leader>rt  :GoRemoveTags<CR>
+  autocmd FileType go nmap <leader>gi  :GoImports<CR>
+  autocmd FileType go nmap <leader>ga  :GoAlternate<CR>
+  autocmd FileType go nmap <leader>gd  :GoDecls<CR>
+  autocmd FileType go nmap <leader>ggd  :GoDeclsDir<CR>
+  " Sometime use leader is delay, so use `g` instead
+  autocmd FileType go nmap gt  <Plug>(go-def)
+  autocmd FileType go nmap gb  <Plug>(go-def-pop)
+  autocmd FileType go nmap gs  <Plug>(go-def-stack)
+  autocmd FileType go nmap gc  <Plug>(go-def-stack-clear)
+augroup END
+
 " let g:go_fmt_command = "goimports"
 let g:go_fmt_command = "gofmt"
 let g:go_rename_command = "gopls"
@@ -275,15 +279,27 @@ set list lcs=tab:\|\
 let g:ruby_host_prog = '/Users/adityapratama/.rbenv/versions/2.6.3/lib/ruby/gems/2.6.0/gems/neovim-0.8.1/exe/neovim-ruby-host'
 
 " JSON formatter {{{
-" https://coderwall.com/p/faceag/format-json-in-vim
-autocmd FileType json nmap <leader>jf :%!python3 -m json.tool<CR>
-" https://til.hashrocket.com/posts/ha0ci0pvkj-format-json-in-vim-with-jq
-" :%! jq .
-" :%! jq '[.products[].id]
-autocmd FileType json nmap <leader>jq :%!jq 
+augroup json_formater
+  autocmd!
+  " https://coderwall.com/p/faceag/format-json-in-vim
+  autocmd FileType json nmap <leader>jf :%!python3 -m json.tool<CR>
+  " https://til.hashrocket.com/posts/ha0ci0pvkj-format-json-in-vim-with-jq
+  " :%! jq .
+  " :%! jq '[.products[].id]
+  autocmd FileType json nmap <leader>jq :%!jq
+augroup END
 " }}}
 
-function MyRegisterJSPath()
-  set path+=$PWD
-  set suffixesadd+=.js
-endfunction
+" Fold {{{
+augroup fold_method
+  autocmd!
+  autocmd FileType vim setlocal foldmethod=marker
+augroup END
+" }}}
+
+" Tag/Ctag setting {{{
+augroup tag_path
+  autocmd!
+  autocmd FileType javascript,js set path+=$PWD suffixesadd+=.js
+augroup END
+" }}}
