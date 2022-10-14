@@ -1,4 +1,4 @@
-" zr - open all folding
+
 " zm - close all folding
 " za - toggle single foling
 
@@ -22,6 +22,7 @@ set splitright
 set hidden
 set mouse=a
 set laststatus=3
+set cmdheight=1
 " }}}
 
 " specify a directory for plugins
@@ -70,8 +71,13 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-dispatch' "async compile
 " }}}
 
+Plug 'phaazon/hop.nvim'
+
 " Plug Themes {{{
 Plug 'gruvbox-community/gruvbox'
+Plug 'tanvirtin/monokai.nvim'
+" Plug 'catppuccin/nvim', {'as': 'catppuccin'}
+Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 " }}}
 
 " Plug Go {{{
@@ -82,12 +88,13 @@ Plug 'fatih/vim-go', { 'tag': '*' }
 Plug '~/.vim/plugged/vim-secret'
 Plug '~/.nvim/plugged/vim-org'
 Plug '~/.nvim/plugged/my-markdown'
+Plug '~/.nvim/plugged/myindentline.vim'
 " Plug '~/.vim/plugged/todos-org'
 " }}}
 
 Plug 'nvim-treesitter/nvim-treesitter', {'branch': '0.5-compat','do': ':TSUpdate'}  " We recommend updating the parsers on update
 Plug 'nvim-treesitter/nvim-treesitter-refactor'
-
+Plug 'nvim-treesitter/playground'
 call plug#end()
 
 " termgui & syntax setting {{{
@@ -101,10 +108,11 @@ syntax enable
 
 " Theme setting {{{
 set background=dark
-" let g:gruvbox_bold=0
+let g:gruvbox_bold=0
 let g:gruvbox_italic=1
 let g:gruvbox_contrast_light="hard"
 colorscheme gruvbox
+" colorscheme tokyonight
 " }}}
 
 " Global setting {{{
@@ -199,7 +207,7 @@ augroup END
 " }}}
 
 " NERDTree setting {{{
-nnoremap <silent> <leader>kb :NERDTreeToggle<CR>
+nnoremap <silent> <leader>kb :NERDTreeToggle<CR><CR>
 " }}}
 
 " Nerdcommenter {{{
@@ -214,7 +222,7 @@ nnoremap <leader>vs :source $MYVIMRC<cr>
 
 " Tab {{{
 " for golang since gofmt use tab instead of space
-set list lcs=tab:\|\ 
+set list lcs=tab:\│\ 
 " }}}
 
 let g:ruby_host_prog = '/Users/adityapratama/.rbenv/versions/2.7.1/lib/ruby/gems/2.7.0/gems/neovim-0.8.1/exe/neovim-ruby-host'
@@ -326,25 +334,26 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
   buf_set_keymap('n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+  buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+  buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  buf_set_keymap('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+  buf_set_keymap('n', '<space>f', '<cmd>lua vim.lsp.buf.format({ async = true})<CR>', opts)
   buf_set_keymap('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   buf_set_keymap('n', '<leader>rn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
   buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   buf_set_keymap('v', '<leader>ca', ':<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
 
   -- Set some keybinds conditional on server capabilities
-  if client.resolved_capabilities.document_formatting then
-    buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-  elseif client.resolved_capabilities.document_range_formatting then
+  if client.server_capabilities.document_formatting then
+    -- vim.lsp.buf.format { async = true }
+    buf_set_keymap("n", "<space>f",  "<cmd>lua vim.lsp.buf.format { async = true }<CR>", opts)
+  elseif client.server_capabilities.document_range_formatting then
     buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
   end
 
   -- Set autocommands conditional on server_capabilities
-  if client.resolved_capabilities.document_highlight then
+  if client.server_capabilities.document_highlight then
     vim.api.nvim_exec([[
       hi LspReferenceRead cterm=bold ctermbg=red guibg=LightYellow
       hi LspReferenceText cterm=bold ctermbg=red guibg=LightYellow
@@ -369,11 +378,27 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 -- Use a loop to conveniently both setup defined servers 
 -- and map buffer local keybindings when the language server attaches
 local eslint = {
-  lintCommand = "eslint_d -f unix --stdin --stdin-filename ${INPUT}",
+  lintCommand = "eslint_d -f visualstudio --stdin --stdin-filename ${INPUT}",
+  lintStdin = true,
+  -- lintFormats = {"%f:%l:%c: %m"},
+  lintFormats = {
+    "%f(%l,%c): %tarning %m",
+    "%f(%l,%c): %rror %m"
+  },
+  lintIgnoreExitCode = true,
+  -- formatCommand = "eslint_d --fix-to-stdout --stdin --stdin-filename=${INPUT}",
+  formatCommand = 'prettierd "${INPUT}"',
+  formatStdin = true
+}
+
+local rubocop = {
+  -- lintCommand = "bundle exec rubocop --format emacs --force-exclusion --stdin ${INPUT}",
+  lintCommand = "rubocop --format emacs --force-exclusion --stdin ${INPUT}",
   lintStdin = true,
   lintFormats = {"%f:%l:%c: %m"},
   lintIgnoreExitCode = true,
-  formatCommand = "eslint_d --fix-to-stdout --stdin --stdin-filename=${INPUT}",
+  -- formatCommand = "bundle exec rubocop --auto-correct-all ${INPUT}",
+  formatCommand = "rubocop --auto-correct-all ${INPUT}",
   formatStdin = true
 }
 
@@ -384,8 +409,8 @@ for _, lsp in ipairs(servers) do
     nvim_lsp[lsp].setup {
       on_attach = on_attach,
       capabilities = capabilities,
-      -- init_options = {documentFormatting = true},
-      filetypes = {"javascript"},
+      init_options = { documentFormatting = true },
+      filetypes = { "javascript", "javascriptreact", "typescriptreact", "ruby" },
       root_dir = function(fname)
         -- Omit multi .eslintrc insinde root_dir
         if string.find(fname, "browser") then
@@ -398,9 +423,11 @@ for _, lsp in ipairs(servers) do
         return util.root_pattern(".eslintrc")(fname)
       end,
       settings = {
-        rootMarkers = {".eslintrc"},
+        rootMarkers = { ".eslintrc", "Gemfile" },
         languages = {
-          javascript = {eslint}
+          javascript = {  eslint },
+          typescriptreact = { eslint },
+          ruby = { rubocop }
         }
       },
       flags = {
@@ -437,9 +464,9 @@ for _, lsp in ipairs(servers) do
     }
   elseif lsp == "tsserver" then
     nvim_lsp[lsp].setup {
-      on_attach=on_attach,
-      capabilities = capabilites,
-      filetypes = { "typescript", "typescriptreact", "typescript.tsx" }
+      on_attach = on_attach,
+      capabilities = capabilities,
+      filetypes = { "typescript", "typescriptreact", "typescript.tsx" },
     }
   else
     nvim_lsp[lsp].setup { on_attach = on_attach }
@@ -449,7 +476,7 @@ EOF
 
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  -- ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   highlight = {
     enable = true,              -- false will disable the whole extension
     additional_vim_regex_highlighting = false,
@@ -472,14 +499,19 @@ require'nvim-treesitter.configs'.setup {
 EOF
 
 lua <<EOF
+  local has_words_before = function()
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+  end
   -- Setup nvim-cmp.
   local cmp = require'cmp'
+  local luasnip = require('luasnip')
 
   cmp.setup({
     snippet = {
       expand = function(args)
-        require('luasnip').lsp_expand(args.body)
-      end,
+        luasnip.lsp_expand(args.body)
+      end
     },
      mapping = cmp.mapping.preset.insert({
       ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -489,13 +521,36 @@ lua <<EOF
       ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
       ["<C-p>"] = cmp.mapping.select_prev_item(),
       ["<C-n>"] = cmp.mapping.select_next_item(),
+
+      ["<Tab>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        elseif has_words_before() then
+          cmp.complete()
+        else
+          fallback()
+        end
+      end, { "i", "s" }),
+
+      ["<S-Tab>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        elseif luasnip.jumpable(-1) then
+          luasnip.jump(-1)
+        else
+          fallback()
+        end
+      end, { "i", "s" }),
     }),
-    sources = {
-      { name = 'nvim_lsp' },
-      { name = 'luasnip' },
-      { name = 'path' },
-      -- { name = 'buffer' },
-    }
+    sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'luasnip' },
+      }, {
+        { name = 'path' },
+        -- { name = 'buffer' },
+    })
   })
 EOF
 
@@ -538,14 +593,24 @@ EOF
 augroup lsp_buf_format
   autocmd!
   autocmd BufWritePre *.go lua goimports(300)
-  autocmd BufWritePre *.go lua vim.lsp.buf.formatting()
-  autocmd BufWritePre *.rs lua vim.lsp.buf.formatting(nil, 5000)
+  autocmd BufWritePre *.go lua vim.lsp.buf.format { async = true }
+  autocmd BufWritePre *.rs lua vim.lsp.buf.format { async = true }
 augroup END
 
 nnoremap <leader>nt :e ~/project/org/hijup.org<CR>
 
 nnoremap <leader>? :lua require('clue').new()<CR>
 
+" hop {{{
+lua <<EOF
+require'hop'.setup()
+
+vim.api.nvim_set_keymap('', 'f', "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true })<cr>", {})
+vim.api.nvim_set_keymap('', 'F', "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<cr>", {})
+vim.api.nvim_set_keymap('', 't', "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true, hint_offset = -1 })<cr>", {})
+vim.api.nvim_set_keymap('', 'T', "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 })<cr>", {})
+EOF
+" }}}
 
 " custom statusline{{{
 function! GitBranch()
@@ -616,6 +681,7 @@ au InsertEnter * highlight StatusLineMode guibg=#689d6a ctermbg=235 guifg=#28282
 
 " Workaround of neovim diagnostic Error gruvbox color {{{
 highlight DiagnosticError guifg=#cc241d
+highlight DiagnosticWarn guifg=#d79921
 " }}}
 
 " Flash highlight after yank {{{
@@ -623,3 +689,31 @@ au TextYankPost * silent! lua vim.highlight.on_yank()
 " }}}
 
 let g:indentLine_color_gui = '#3c3836'
+let g:indentLine_char = '│'
+
+lua <<EOF
+function markfile()
+    local home = os.getenv('HOME')
+    local markfile, err = io.open(home..'/.config/markfile/marks','w')
+    if markfile then
+        local current_file = vim.fn.expand('%:p')
+
+        print('mark:', current_file)
+
+        markfile:write(current_file)
+        markfile:close()
+    else
+        print('error:', err)
+    end
+end
+EOF
+
+lua <<EOF
+function timer()
+  local curr_time = os.time()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  local line = vim.api.nvim_get_current_line()
+  local nline = line..curr_time
+  vim.api.nvim_set_current_line(nline)
+end
+EOF
