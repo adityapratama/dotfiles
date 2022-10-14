@@ -1,0 +1,16 @@
+require 'default'
+require 'plugins'
+require 'theme'
+require 'globals'
+require 'telescope_config'
+require 'lsp_config'
+require 'cmp_config'
+require 'treesitter_config'
+require 'gitcmd'
+require 'hop_keymaps'
+-- nvim-tree
+require("nvim-tree").setup()
+require 'keymaps'
+require 'custom_augroup'
+require 'custom_command'
+require 'statusline_config'
