@@ -45,13 +45,16 @@ return require('packer').startup({ function(use)
   use { 'phaazon/hop.nvim' }
   use { 'kyazdani42/nvim-tree.lua' }
   use { 'rcarriga/nvim-notify' }
+  use { 'nvim-lualine/lualine.nvim', requires = { 'kyazdani42/nvim-web-devicons', opt = true } }
 
   -- Themes
   use { 'gruvbox-community/gruvbox' }
-  use { 'tanvirtin/monokai.nvim' }
+  -- use { 'tanvirtin/monokai.nvim' }
+  -- use { 'luisiacc/gruvbox-baby', branch = 'main' }
   -- use { 'catppuccin/nvim', as = 'catppuccin' }
   use { 'folke/tokyonight.nvim', branch = 'main' }
-  use { 'rebelot/kanagawa.nvim' }
+  -- use { 'rebelot/kanagawa.nvim' }
+  -- use { 'rose-pine/neovim', as = 'rose-pine' }
 
   -- Golang
   use { 'fatih/vim-go', tag = '*' }
