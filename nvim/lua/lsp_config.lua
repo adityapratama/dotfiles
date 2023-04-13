@@ -29,7 +29,7 @@ local on_attach = function(client, bufnr)
     -- vim.lsp.buf.format { async = true }
     buf_set_keymap("n", "<space>f",  "<cmd>lua vim.lsp.buf.format { async = true }<CR>", opts)
   elseif client.server_capabilities.document_range_formatting then
-    buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
+    buf_set_keymap("v", "<space>f", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
   end
 
   -- Set autocommands conditional on server_capabilities
@@ -52,7 +52,7 @@ local on_attach = function(client, bufnr)
   end
 end
 
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 -- Use a loop to conveniently both setup defined servers 
@@ -78,7 +78,7 @@ local rubocop = {
   lintFormats = {"%f:%l:%c: %m"},
   lintIgnoreExitCode = true,
   -- formatCommand = "bundle exec rubocop --auto-correct-all ${INPUT}",
-  formatCommand = "rubocop --auto-correct-all ${INPUT}",
+  formatCommand = "rubocop -A -f quiet --stderr -s ${INPUT}",
   formatStdin = true
 }
 
