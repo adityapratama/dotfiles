@@ -33,4 +33,3 @@ vim.api.nvim_create_user_command('GGpull', 'lua GitCmd("pull", true)', {})
 vim.api.nvim_create_user_command('GGpush', 'lua GitCmd("push", true)', {})
 vim.api.nvim_create_user_command('Gpull', 'lua GitCmd("pull")', {})
 vim.api.nvim_create_user_command('Gpush', 'lua GitCmd("push")', {})
-
